@@ -1,0 +1,29 @@
+name: DAST Demo Env
+
+on:
+  workflow_dispatch:
+jobs:
+  dast:
+    runs-on: ["self-hosted", "EasyBuggy"]
+    name: DAST on Prem Testing Action
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Checkmarx DAST Github Action
+        uses: Checkmarx/dast-github-action@v1.0.1-beta
+        env:
+          CX_APIKEY: ${{ secrets.AST_API_KEY }}
+        with:
+          command: web
+          config: ${{ github.workspace }}/dast-config/zap_config.yaml
+          environment_id: cc5db649-16e0-4a39-8557-5eae3c7208fd
+          log_level: info
+          base_url: https://deu.ast.checkmarx.net/
+          verbose: true
+          output: output
+      - uses: actions/upload-artifact@v3
+        name: Upload Logs
+        with:
+          name: report
+          path: ./output
+      
